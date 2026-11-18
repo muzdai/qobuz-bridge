@@ -1,0 +1,54 @@
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.muzdai.qobuzbridge'
+    compileSdk 34
+
+    defaultConfig {
+        applicationId 'com.muzdai.qobuzbridge'
+        minSdk 26
+        targetSdk 34
+        versionCode 2
+        versionName '1.0.1'
+    }
+
+    // Release signing from the environment (GitHub Actions secrets, or /root/apk-sign/with-signing.sh locally);
+    // without it the debug key signs.
+    signingConfigs {
+        release {
+            def ks = System.getenv('SIGNING_STORE_FILE')
+            if (ks) {
+                storeFile file(ks)
+                storePassword System.getenv('SIGNING_STORE_PASSWORD')
+                keyAlias System.getenv('SIGNING_KEY_ALIAS')
+                keyPassword System.getenv('SIGNING_KEY_PASSWORD')
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            // No R8: the Xposed entry class (assets/xposed_init) and DexKit are reached by name.
+            minifyEnabled false
+            signingConfig System.getenv('SIGNING_STORE_FILE') ? signingConfigs.release : signingConfigs.debug
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+}
+
+dependencies {
+    // Provided by the Xposed framework (Vector) inside the hooked app; never packed into the APK.
+    compileOnly 'de.robv.android.xposed:api:82'
+    // Finds Qobuz's obfuscated player classes by the strings they log, so a Qobuz update need not break the module.
+    implementation 'org.luckypray:dexkit:2.3.0'
+    // DexKit is written in Kotlin and needs its standard library at run time.
+    implementation 'org.jetbrains.kotlin:kotlin-stdlib:1.9.24'
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation 'org.json:json:20240303'
+}

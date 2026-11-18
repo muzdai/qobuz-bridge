@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Qobuz Bridge</string>
+    <string name="description">Lets vPro TV Launcher start a Qobuz track or album by its catalogue id, without pressing on the screen.</string>
+    <string-array name="scope" translatable="false">
+        <item>com.qobuz.music</item>
+    </string-array>
+</resources>
